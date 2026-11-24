@@ -20,10 +20,21 @@ def main() -> int:
         data = f.read()
     text = data.decode("utf-8")
     if not 1 <= len(text) <= 8:
-        print(f"entry must be 1-8 characters, got {len(text)}", file=sys.stderr)
+        print(
+            f"entry must be 1-8 characters, got {len(text)} "
+            f"({len(data)} bytes)",
+            file=sys.stderr,
+        )
         return 1
     if text.strip() == "":
         print("entry must not be only white space", file=sys.stderr)
+        return 1
+    if text != text.strip():
+        print(
+            f"entry must not have leading/trailing white space, "
+            f"got {len(text)} characters",
+            file=sys.stderr,
+        )
         return 1
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(OUTPUT, "wb") as f:
@@ -31,7 +42,11 @@ def main() -> int:
     with open(OUTPUT, "rb") as f:
         written = f.read()
     if written != data:
-        print("verification failed: output differs from source", file=sys.stderr)
+        print(
+            f"verification failed: output differs from source "
+            f"(wrote {len(written)} bytes, expected {len(data)} bytes)",
+            file=sys.stderr,
+        )
         return 1
     print(f"wrote {len(data)} bytes ({len(text)} characters) to {OUTPUT}")
     return 0
